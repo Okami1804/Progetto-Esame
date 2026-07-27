@@ -11,6 +11,7 @@ Questo progetto analizza e modella il movimento chemiotattico dei batteri (*E. c
 
 * `dataset_batteri.csv`: Dataset con le traiettorie e le misurazioni fisiche dei batteri nel tempo.
 * `Progetto.py`: Script principale Python contenente la pipeline completa.
+* `Presentazione_Progetto.pptx`: Presentazione PowerPoint del progetto.
 * File dei grafici per la presentazione:
     `convergenza_ga.png`: Convergenza dell'Algoritmo Evolutivo;
     `ottimizzazione_soglia.png`: Curva Precision-Recall e Soglia Ottimale;
