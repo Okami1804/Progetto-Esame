@@ -276,9 +276,12 @@ pipe_base = make_pipeline(  # Ora utilizziamo il comando per pipeline classico d
     )
 )
 
-# Dato che il target continuo y_reg è molto sbilanciato, non è lineare e ha una distribuzione molto asimmetrica, utilizziamo TransformedTargetRegressor per scalare il target continuo y_reg invece di uno scaling standard.
+'''Utilizziamo TransformedTargetRegressor con StandardScaler per normalizzare la variabile target (tumble_probability). 
+Anche se lo StandardScaler non modifica la forma della distribuzione (non rimuove l'asimmetria),
+portare il target a media 0 e varianza 1 stabilizza l'addestramento dell'MLPRegressor,
+favorendo una convergenza più rapida e fluida dei gradienti.'''
 # Questo scalerà Y in fase di fit() e farà l'inverse_transform in fase di predict()
-model_regresso_ottimizzato = TransformedTargetRegressor(    # Qui utilizziamo TransformedTargetRegressor per scalare il target continuo y_reg.
+model_regresso_ottimizzato = TransformedTargetRegressor(    
     regressor=pipe_base,
     transformer=StandardScaler()
 )
