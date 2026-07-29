@@ -30,7 +30,7 @@ groups_train = groups.iloc[train_idx] # Per Cross-Validation
 from deap import base, creator, tools
 import random
 
-# Definiamo gkf
+# Definiamo gkf, funzione che utilizzeremo per la Cross-Validation basata sui gruppi (batteri) per valutare le configurazioni della rete neurale. Usiamo 5 split per avere una valutazione più robusta.
 gkf = GroupKFold(n_splits=5)  
 
 # Inizio algoritmo evolutivo
@@ -46,7 +46,7 @@ def evaluate_mlp(individual):
     n1 = max(4, int(individual[0]))
     n2 = max(4, int(individual[1]))
     
-    pipe_test = make_pipeline_imb(  # Serve perche la pipeline classica di sklearn non supporta SMOTE
+    pipe_test = make_pipeline_imb(  # Serve perchè la pipeline classica di sklearn non supporta SMOTE (vedi dopo)
         StandardScaler(),
         SMOTE(random_state=42),
         MLPClassifier(hidden_layer_sizes=(n1, n2), max_iter=300, random_state=42, early_stopping=True)
@@ -125,7 +125,7 @@ print("\nInizio Cross-Validation ed Evoluzione (DEAP)")
 history_best_fitness = [] #Liste per grafico di convergenza dell'algoritmo evolutivo
 history_avg_fitness = []
 # Valutazione della popolazione iniziale
-evaluate_invalid_individuals(population, toolbox)
+evaluate_invalid_individuals(population, toolbox) # Valutiamo la popolazione iniziale e aggiorniamo la Hall of Fame con i migliori individui
 hall_of_fame.update(population)
 
 # Ciclo Evolutivo
@@ -177,9 +177,7 @@ for generation in range(1, NUM_GENERATIONS + 1):
 
 # Estrazione del campione finale
 best_individual = hall_of_fame[0]
-best_n1 = max(4, int(best_individual[0]))
-best_n2 = max(4, int(best_individual[1]))
-miglior_configurazione = (best_n1, best_n2)
+miglior_configurazione = (int(best_individual[0]), int(best_individual[1]))
 
 print(f"\nL'evoluzione con DEAP ha scelto la struttura: {miglior_configurazione}\n")
 # Fine algoritmo evolutivo
@@ -256,6 +254,11 @@ y_pred_test = (y_proba_test >= soglia).astype(int)  # Predizione finale sul test
 print("Risultati sul Test Set")
 print(confusion_matrix(y_test, y_pred_test))    # Stampa la Matrice di confusione
 print(classification_report(y_test, y_pred_test))  # Stampa il Report di classificazione, tutte le metriche principali di classificazione
+
+
+#PARTE 2: REGRESSORE PER LA PROBABILITA' DI TUMBLE (TARGET CONTINUO)
+
+
 from sklearn.compose import TransformedTargetRegressor
 from sklearn.neural_network import MLPRegressor
 from sklearn.metrics import r2_score, mean_squared_error
@@ -269,7 +272,7 @@ y_test_reg = y_reg.iloc[test_idx]
 pipe_base = make_pipeline(  # Ora utilizziamo il comando per pipeline classico dato che non abbiamo bisogno di SMOTE
     StandardScaler(),   # StandardScaler come nel caso precedente per normalizzare le feature
     MLPRegressor(   # Impostiamo una MLPRegressor con due hidden layer, 32 e 16 neuroni, max_iter=1000 e tol=1e-6 (piu alto della default 1e-4 per avere una convergenza più precisa)
-        hidden_layer_sizes=(32, 16),
+        hidden_layer_sizes=(32, 16), # Come funzione di attivazione usiamo ReLU, che è di default.
         max_iter=1000,
         tol=1e-6,
         random_state=42
@@ -301,15 +304,15 @@ print(f"R² : {r2:.6f}") # Come vediamo otteniamo un R² molto alto con MSE prat
 print(f"MSE : {mse:.10f}")
 
 '''
-# ==========================================
-# --- GRAFICI PER LA PRESENTAZIONE 
-# ==========================================
+
+# GRAFICI PER LA PRESENTAZIONE 
+
 import matplotlib.pyplot as plt
 from sklearn.metrics import ConfusionMatrixDisplay
 
 
 fig_size = (8, 5)
-# --- 1. Matrice di Confusione   ---
+# 1. Matrice di Confusione
 fig, ax = plt.subplots(figsize=(6, 5))
 ConfusionMatrixDisplay.from_predictions(
     y_test,
@@ -325,10 +328,10 @@ ax.set_xlabel('Predizione', fontsize=10)
 ax.set_ylabel('Valore Reale', fontsize=10)
 ax.grid(False)  
 plt.tight_layout()
-plt.savefig('matrice_confusione_test.png', dpi=300)
+plt.savefig('matrice_confusione.png', dpi=300)
 plt.close()
 
-# --- 2. Curva Precision-Recall e Soglia Ottimale ---
+# 2. Curva Precision-Recall e Soglia Ottimale
 
 plt.figure(figsize=fig_size)
 plt.plot(thresholds, precisions[:-1], 'b--', label='Precision', linewidth=2)
@@ -347,10 +350,10 @@ plt.xlabel('Soglia di Probabilità', fontsize=10)
 plt.ylabel('Punteggio Metrica', fontsize=10)
 plt.legend(loc='best')
 plt.tight_layout()
-plt.savefig('ottimizzazione_soglia_test.png', dpi=300)
+plt.savefig('ottimizzazione_soglia.png', dpi=300)
 plt.close()
 
-# --- 3. Regressione: Valori Reali vs Predetti (R²) ---
+# 3. Regressione: Valori Reali vs Predetti (R²)
 plt.figure(figsize=fig_size)
 plt.scatter(
     y_test_reg, y_pred_reg, alpha=0.5, color='#10b981', edgecolors='k', s=30
@@ -371,10 +374,10 @@ plt.xlabel('Probabilità Reale', fontsize=10)
 plt.ylabel('Probabilità Predetta', fontsize=10)
 plt.legend()
 plt.tight_layout()
-plt.savefig('regressione_r2_test.png', dpi=300)
+plt.savefig('regressione_r2.png', dpi=300)
 plt.close()
 
-# --- 4. Convergenza dell'Algoritmo Evolutivo ---
+# 4. Convergenza dell'Algoritmo Evolutivo
 plt.figure(figsize=fig_size)
 plt.plot(
     range(1, NUM_GENERATIONS + 1),
@@ -402,7 +405,7 @@ plt.ylabel('F1-Score', fontsize=10)
 plt.xticks(range(1, NUM_GENERATIONS + 1))
 plt.legend(loc='best')
 plt.tight_layout()
-plt.savefig('convergenza_ga_test.png', dpi=300)
+plt.savefig('convergenza_ga.png', dpi=300)
 plt.close()
 
 
