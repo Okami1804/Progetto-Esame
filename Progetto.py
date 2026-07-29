@@ -325,7 +325,7 @@ ax.set_xlabel('Predizione', fontsize=10)
 ax.set_ylabel('Valore Reale', fontsize=10)
 ax.grid(False)  
 plt.tight_layout()
-plt.savefig('matrice_confusione.png', dpi=300)
+plt.savefig('matrice_confusione_test.png', dpi=300)
 plt.close()
 
 # --- 2. Curva Precision-Recall e Soglia Ottimale ---
@@ -347,7 +347,7 @@ plt.xlabel('Soglia di Probabilità', fontsize=10)
 plt.ylabel('Punteggio Metrica', fontsize=10)
 plt.legend(loc='best')
 plt.tight_layout()
-plt.savefig('ottimizzazione_soglia.png', dpi=300)
+plt.savefig('ottimizzazione_soglia_test.png', dpi=300)
 plt.close()
 
 # --- 3. Regressione: Valori Reali vs Predetti (R²) ---
@@ -371,7 +371,7 @@ plt.xlabel('Probabilità Reale', fontsize=10)
 plt.ylabel('Probabilità Predetta', fontsize=10)
 plt.legend()
 plt.tight_layout()
-plt.savefig('regressione_r2.png', dpi=300)
+plt.savefig('regressione_r2_test.png', dpi=300)
 plt.close()
 
 # --- 4. Convergenza dell'Algoritmo Evolutivo ---
@@ -402,7 +402,7 @@ plt.ylabel('F1-Score', fontsize=10)
 plt.xticks(range(1, NUM_GENERATIONS + 1))
 plt.legend(loc='best')
 plt.tight_layout()
-plt.savefig('convergenza_ga.png', dpi=300)
+plt.savefig('convergenza_ga_test.png', dpi=300)
 plt.close()
 
 

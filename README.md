@@ -9,7 +9,7 @@ Questo progetto analizza e modella il movimento chemiotattico dei batteri (*E. c
 
 ## 📁 Struttura del Repository
 
-* `dataset_batteri.csv`: Dataset con le traiettorie e le misurazioni fisiche dei batteri nel tempo.
+* `dataset_batteri.csv`: Dataset con le traiettorie e le misurazioni fisiche dei batteri nel tempo. (fonte: https://www.kaggle.com/datasets/uniquetech/e-coli-chemotaxis-simulation-biophysics)
 * `Progetto.py`: Script principale Python contenente la pipeline completa.
 * `Presentazione_Progetto.pptx`: Presentazione PowerPoint del progetto.
 * File dei grafici per la presentazione:
